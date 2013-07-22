@@ -20,6 +20,7 @@ import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.SubsystemRegistration;
+import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
 import org.jboss.as.controller.operations.common.GenericSubsystemDescribeHandler;
 import org.jboss.as.controller.operations.common.Util;
@@ -86,7 +87,7 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 			XMLElementReader<List<ModelNode>>,
 			XMLElementWriter<SubsystemMarshallingContext> {
 
-		private static final String ELEMENT_PROPERTY_GROUP = "propertyGroup";
+		private static final String ELEMENT_PROPERTY_GROUP = "property-group";
 		private static final String ELEMENT_PROPERTIES = "properties";
 		private static final String ELEMENT_PROPERTY = "property";
 		private static final String ATTRIBUTE_NAME = "name";
@@ -104,20 +105,26 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 			ModelNode node = context.getModelNode();
 			ModelNode propertyGroups = node.get(PROPERTY_GROUP_NAME);
 			if (propertyGroups.isDefined()) {
-				writer.writeStartElement(ELEMENT_PROPERTY_GROUP);
+			    System.out.println("Property groups addr: " + propertyGroups);
+				for (String groupKey : propertyGroups.keys()) {
+				    writer.writeStartElement(ELEMENT_PROPERTY_GROUP);
+				    writer.writeAttribute(ATTRIBUTE_NAME, groupKey);
 				
-				ModelNode properties = node.get(PROPERTY_NAME);
-				if (properties.isDefined()) {
-				    writer.writeStartElement(ELEMENT_PROPERTIES);
-    				for (String key : properties.keys()) {
-    					writer.writeStartElement(ELEMENT_PROPERTY);
-    					writer.writeAttribute(ATTRIBUTE_NAME, key);
-    					EAPConfigExtensionPropertyDefinition.VALUE.marshallAsAttribute(properties.get(key), writer);
-    					writer.writeEndElement();
-    				}
-    				writer.writeEndElement();
+				    ModelNode properties = propertyGroups.get(groupKey).get(PROPERTY_NAME);
+				    if (properties.isDefined()) {
+	                    writer.writeStartElement(ELEMENT_PROPERTIES);
+	                    for (String key : properties.keys()) {
+	                        writer.writeStartElement(ELEMENT_PROPERTY);
+	                        writer.writeAttribute(ATTRIBUTE_NAME, key);
+	                        EAPConfigExtensionPropertyDefinition.VALUE.marshallAsAttribute(properties.get(key), writer);
+	                        writer.writeEndElement();
+	                    }
+	                    writer.writeEndElement();
+	                }
+				    System.out.println("Properties: " + properties);
+				    
+				    writer.writeEndElement();
 				}
-				writer.writeEndElement();
 			}
 	        writer.writeEndElement();
 		}
@@ -141,9 +148,8 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 				    String localName = reader.getLocalName();
 					if (localName.equals(ELEMENT_PROPERTY_GROUP)) {
 					    //propertiesOps = parseProperties(reader, address);
-					    ModelNode propertyGroupOp = parsePropertyGroup(reader, address);
-					    propertyGroupOps.add(propertyGroupOp);
-                        break;
+					    List<ModelNode> propertyGroupOpList = parsePropertyGroup(reader, address);
+					    propertyGroupOps.addAll(propertyGroupOpList);
 					}
 					else {
 						throw unexpectedElement(reader);
@@ -156,8 +162,29 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 			}
 		}
 		
-		private ModelNode parsePropertyGroup(XMLExtendedStreamReader reader, PathAddress address) {
+		private List<ModelNode> parsePropertyGroup(XMLExtendedStreamReader reader, PathAddress parent) throws XMLStreamException {
+		    final PathAddress address = parent.append(PROPERTY_GROUP_NAME, reader.getAttributeValue(null, ATTRIBUTE_NAME));
+            final ModelNode addOp = Util.createAddOperation(address);
 		    
+		    List<ModelNode> propertyGroupOps = new ArrayList<ModelNode>();
+            propertyGroupOps.add(addOp);
+		    
+            while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+                String ns = reader.getNamespaceURI();
+                if (ns.equals(EAPConfigExtensionSubsystemExtension.NAMESPACE)) {
+                    String localName = reader.getLocalName();
+                    if (localName.equals(ELEMENT_PROPERTIES)) {
+                        List<ModelNode> propertiesOps = parseProperties(reader, address);
+                        propertyGroupOps.addAll(propertiesOps);
+                    }
+                    else {
+                        throw unexpectedElement(reader);
+                    }
+                }
+            }
+
+            System.out.println("Property group add ops: " + propertyGroupOps);
+            return propertyGroupOps;
 		}
 
 		private List<ModelNode> parseProperties(XMLExtendedStreamReader reader,
@@ -223,7 +250,7 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 
 			requireNoContent(reader);
 
-			final PathAddress address = parent.append(ELEMENT_PROPERTY, name);
+			final PathAddress address = parent.append(PROPERTY_NAME, name);
 			ModelNode propNode = Util.createAddOperation(address);
 			propNode.get(ATTRIBUTE_VALUE).set(value);
 			return propNode;
