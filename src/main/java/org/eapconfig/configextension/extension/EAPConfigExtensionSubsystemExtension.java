@@ -20,7 +20,6 @@ import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.SubsystemRegistration;
-import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
 import org.jboss.as.controller.operations.common.GenericSubsystemDescribeHandler;
 import org.jboss.as.controller.operations.common.Util;
@@ -105,7 +104,6 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 			ModelNode node = context.getModelNode();
 			ModelNode propertyGroups = node.get(PROPERTY_GROUP_NAME);
 			if (propertyGroups.isDefined()) {
-			    System.out.println("Property groups addr: " + propertyGroups);
 				for (String groupKey : propertyGroups.keys()) {
 				    writer.writeStartElement(ELEMENT_PROPERTY_GROUP);
 				    writer.writeAttribute(ATTRIBUTE_NAME, groupKey);
@@ -121,7 +119,6 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 	                    }
 	                    writer.writeEndElement();
 	                }
-				    System.out.println("Properties: " + properties);
 				    
 				    writer.writeEndElement();
 				}
@@ -183,7 +180,6 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
                 }
             }
 
-            System.out.println("Property group add ops: " + propertyGroupOps);
             return propertyGroupOps;
 		}
 
