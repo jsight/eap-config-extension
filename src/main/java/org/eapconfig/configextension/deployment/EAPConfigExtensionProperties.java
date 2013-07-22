@@ -10,10 +10,7 @@ public class EAPConfigExtensionProperties extends Properties {
 
 	private List<EAPConfigExtensionPropertyListener> listeners = new ArrayList<EAPConfigExtensionPropertyListener>();
 	
-	private static final EAPConfigExtensionProperties instance = new EAPConfigExtensionProperties();
-
-	public static EAPConfigExtensionProperties getInstance() {
-		return instance;
+	public EAPConfigExtensionProperties() {
 	}
 	
 	public void addPropertyListener(EAPConfigExtensionPropertyListener listener) {

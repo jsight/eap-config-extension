@@ -2,15 +2,11 @@ package org.eapconfig.configextension.extension;
 
 import java.util.List;
 
-import org.eapconfig.configextension.deployment.EAPConfigExtensionProperties;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
-import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
-import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceController;
 
 /**
@@ -19,8 +15,6 @@ import org.jboss.msc.service.ServiceController;
 class EAPConfigExtensionSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     static final EAPConfigExtensionSubsystemAdd INSTANCE = new EAPConfigExtensionSubsystemAdd();
-
-    private final Logger log = Logger.getLogger(EAPConfigExtensionSubsystemAdd.class);
 
     private EAPConfigExtensionSubsystemAdd() {
     }

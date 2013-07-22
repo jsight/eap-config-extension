@@ -48,6 +48,7 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 	 */
 	public static final String SUBSYSTEM_NAME = "eapconfigextension";
 
+	public static final String PROPERTY_GROUP_NAME = "propertyGroup";
 	public static final String PROPERTY_NAME = "property";
 	
 	/**
@@ -57,6 +58,7 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 
 	protected static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
 	protected static final PathElement PROPERTY_PATH = PathElement.pathElement(PROPERTY_NAME);
+	protected static final PathElement PROPERTY_GROUP_PATH = PathElement.pathElement(PROPERTY_GROUP_NAME);
 	private static final String RESOURCE_NAME = EAPConfigExtensionSubsystemExtension.class.getPackage().getName() + ".LocalDescriptions";
 
 	static StandardResourceDescriptionResolver getResourceDescriptionResolver(final String keyPrefix) {
@@ -74,9 +76,6 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 		final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, 1, 0);
 		final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(EAPConfigExtensionSubsystemDefinition.INSTANCE);
 		registration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
-
-		registration.registerSubModel(EAPConfigExtensionPropertyDefinition.INSTANCE);
-		
 		subsystem.registerXMLElementWriter(parser);
 	}
 
@@ -87,6 +86,7 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 			XMLElementReader<List<ModelNode>>,
 			XMLElementWriter<SubsystemMarshallingContext> {
 
+		private static final String ELEMENT_PROPERTY_GROUP = "propertyGroup";
 		private static final String ELEMENT_PROPERTIES = "properties";
 		private static final String ELEMENT_PROPERTY = "property";
 		private static final String ATTRIBUTE_NAME = "name";

@@ -16,9 +16,10 @@ public class EAPConfigExtensionSubsystemDefinition extends SimpleResourceDefinit
                 //Every resource that is added, normally needs a remove operation
                 EAPConfigExtensionSubsystemRemove.INSTANCE);
     }
-
+    
     @Override
-    public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
-        super.registerAttributes(resourceRegistration);
+    public void registerChildren(
+    		ManagementResourceRegistration resourceRegistration) {
+    	resourceRegistration.registerSubModel(EAPConfigExtensionPropertyGroupDefinition.INSTANCE);
     }
 }

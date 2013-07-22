@@ -4,7 +4,6 @@ import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.dmr.ModelNode;
-import org.jboss.logging.Logger;
 
 /**
  * Handler responsible for removing the subsystem resource from the model
@@ -13,8 +12,6 @@ import org.jboss.logging.Logger;
 class EAPConfigExtensionSubsystemRemove extends AbstractRemoveStepHandler {
 
     static final EAPConfigExtensionSubsystemRemove INSTANCE = new EAPConfigExtensionSubsystemRemove();
-
-    private final Logger log = Logger.getLogger(EAPConfigExtensionSubsystemRemove.class);
 
     private EAPConfigExtensionSubsystemRemove() {
     }

@@ -28,4 +28,5 @@ public class EAPConfigExtensionPropertyDefinition extends SimpleResourceDefiniti
         super.registerAttributes(resourceRegistration);
         resourceRegistration.registerReadWriteAttribute(VALUE, null, new EAPConfigExtensionPropertyWrite(VALUE));
     }
+    
 }
