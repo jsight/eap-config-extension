@@ -102,14 +102,20 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 					EAPConfigExtensionSubsystemExtension.NAMESPACE, false);
 
 			ModelNode node = context.getModelNode();
-			ModelNode properties = node.get(PROPERTY_NAME);
-			if (properties.isDefined()) {
-				writer.writeStartElement(ELEMENT_PROPERTIES);
-				for (String key : properties.keys()) {
-					writer.writeStartElement(ELEMENT_PROPERTY);
-					writer.writeAttribute(ATTRIBUTE_NAME, key);
-					EAPConfigExtensionPropertyDefinition.VALUE.marshallAsAttribute(properties.get(key), writer);
-					writer.writeEndElement();
+			ModelNode propertyGroups = node.get(PROPERTY_GROUP_NAME);
+			if (propertyGroups.isDefined()) {
+				writer.writeStartElement(ELEMENT_PROPERTY_GROUP);
+				
+				ModelNode properties = node.get(PROPERTY_NAME);
+				if (properties.isDefined()) {
+				    writer.writeStartElement(ELEMENT_PROPERTIES);
+    				for (String key : properties.keys()) {
+    					writer.writeStartElement(ELEMENT_PROPERTY);
+    					writer.writeAttribute(ATTRIBUTE_NAME, key);
+    					EAPConfigExtensionPropertyDefinition.VALUE.marshallAsAttribute(properties.get(key), writer);
+    					writer.writeEndElement();
+    				}
+    				writer.writeEndElement();
 				}
 				writer.writeEndElement();
 			}
@@ -127,27 +133,31 @@ public class EAPConfigExtensionSubsystemExtension implements Extension {
 			final ModelNode addOp = Util.createAddOperation(address);
 			operations.add(addOp);
 
-			List<ModelNode> propertiesOps = null;
+			List<ModelNode> propertyGroupOps = new ArrayList<ModelNode>();
 
 			while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
 				String ns = reader.getNamespaceURI();
 				if (ns.equals(EAPConfigExtensionSubsystemExtension.NAMESPACE)) {
-					final Element element = Element.forName(reader
-							.getLocalName());
-					switch (element) {
-					case PROPERTIES: {
-						propertiesOps = parseProperties(reader, address);
-						break;
+				    String localName = reader.getLocalName();
+					if (localName.equals(ELEMENT_PROPERTY_GROUP)) {
+					    //propertiesOps = parseProperties(reader, address);
+					    ModelNode propertyGroupOp = parsePropertyGroup(reader, address);
+					    propertyGroupOps.add(propertyGroupOp);
+                        break;
 					}
-					default:
+					else {
 						throw unexpectedElement(reader);
 					}
 				}
 			}
 
-			if (propertiesOps != null) {
-				operations.addAll(propertiesOps);
+			if (propertyGroupOps != null) {
+				operations.addAll(propertyGroupOps);
 			}
+		}
+		
+		private ModelNode parsePropertyGroup(XMLExtendedStreamReader reader, PathAddress address) {
+		    
 		}
 
 		private List<ModelNode> parseProperties(XMLExtendedStreamReader reader,
